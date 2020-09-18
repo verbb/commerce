@@ -2267,11 +2267,18 @@ class Order extends Element
             return 0;
         }
 
-        $paidTransactions = ArrayHelper::where($this->getTransactions(), static function(Transaction $transaction) {
+        if ($this->_transactions === null) {
+            Craft::info('Before retrieving transactions', 'commerce');
+            $this->_transactions = Plugin::getInstance()->getTransactions()->getAllTransactionsByOrderId($this->id);
+            Craft::info($this->_transactions, 'commerce');
+            Craft::info('After retrieving transactions', 'commerce');
+        }
+
+        $paidTransactions = ArrayHelper::where($this->_transactions, static function(Transaction $transaction) {
             return $transaction->status == TransactionRecord::STATUS_SUCCESS && ($transaction->type == TransactionRecord::TYPE_PURCHASE || $transaction->type == TransactionRecord::TYPE_CAPTURE);
         });
 
-        $refundedTransactions = ArrayHelper::where($this->getTransactions(), static function(Transaction $transaction) {
+        $refundedTransactions = ArrayHelper::where($this->_transactions, static function(Transaction $transaction) {
             return $transaction->status == TransactionRecord::STATUS_SUCCESS && $transaction->type == TransactionRecord::TYPE_REFUND;
         });
 
@@ -2952,16 +2959,14 @@ class Order extends Element
     {
         Craft::info('Start get transactions (in order element)', 'commerce');
         if (!$this->id) {
-            $this->_transactions = null;
-            return [];
+            $this->_transactions = [];
         }
 
-        // Turning off cache of transactions
-        //if ($this->_transactions === null) {
+        if ($this->_transactions === null) {
             Craft::info('Transactions `null` retrieving latest (in order element)', 'commerce');
             $this->_transactions = Plugin::getInstance()->getTransactions()->getAllTransactionsByOrderId($this->id);
             Craft::info($this->_transactions, 'commerce');
-        //}
+        }
 
         Craft::info('Returning transactions (in order element)', 'commerce');
         return $this->_transactions;
