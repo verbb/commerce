@@ -386,6 +386,7 @@ class Transactions extends Component
      */
     public function saveTransaction(Transaction $model, bool $runValidation = true): bool
     {
+        Craft::info('Start save transaction', 'commerce');
         if ($model->id) {
             throw new TransactionException('Transactions cannot be modified.');
         }
@@ -422,11 +423,17 @@ class Transactions extends Component
             $record->$field = $model->$field;
         }
 
+        Craft::info('Before save transaction', 'commerce');
         $record->save(false);
+        Craft::info('After save transaction', 'commerce');
+        Craft::info('Transaction:', 'commerce');
         $model->id = $record->id;
+        Craft::info($record->toArray(), 'commerce');
 
         if ($model->status === TransactionRecord::STATUS_SUCCESS) {
+            Craft::info('Before update order paid information (in save transaction)', 'commerce');
             $model->order->updateOrderPaidInformation();
+            Craft::info('After update order paid information (in save transaction)', 'commerce');
         }
 
         if ($model->status === TransactionRecord::STATUS_PROCESSING) {

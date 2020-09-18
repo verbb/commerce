@@ -1397,9 +1397,11 @@ class Order extends Element
      */
     public function updateOrderPaidInformation()
     {
+        Craft::info('Start update order paid information', 'commerce');
         $this->_transactions = null; // clear order's transaction cache
 
         $paidInFull = !$this->hasOutstandingBalance();
+        Craft::info('Paid in full: ' . $paidInFull, 'commerce');
         $authorizedInFull = $this->getTotalAuthorized() >= $this->getTotalPrice();
 
         $justPaid = $paidInFull && $this->datePaid == null;
@@ -1430,8 +1432,10 @@ class Order extends Element
         $this->setRecalculationMode(self::RECALCULATION_MODE_NONE);
 
         // Saving the order will update the datePaid as set above and also update the paidStatus.
+        Craft::info('Before Save order (in update order paid info)', 'commerce');
         Craft::$app->getElements()->saveElement($this, false);
-
+        Craft::info('After Save order (in update order paid info)', 'commerce');
+        Craft::info('Order is completed: ' . $this->isCompleted, 'commerce');
         // If the order is now paid or authorized in full, lets mark it as complete if it has not already been.
         if (!$this->isCompleted) {
             $totalAuthorized = $this->getTotalAuthorized();
@@ -1441,7 +1445,9 @@ class Order extends Element
                 // Payment information is still stored in the transactions.
                 $this->paymentSourceId = null;
 
+                Craft::info('Before mark as complete (in update order paid info)', 'commerce');
                 $this->markAsComplete();
+                Craft::info('After mark as complete (in update order paid info)', 'commerce');
             }
         }
 
@@ -2256,12 +2262,16 @@ class Order extends Element
      */
     public function getTotalPaid(): float
     {
+        Craft::info('Start get total paid', 'commerce');
         if (!$this->id) {
             return 0;
         }
 
         if ($this->_transactions === null) {
+            Craft::info('Before retrieving transactions', 'commerce');
             $this->_transactions = Plugin::getInstance()->getTransactions()->getAllTransactionsByOrderId($this->id);
+            Craft::info($this->_transactions, 'commerce');
+            Craft::info('After retrieving transactions', 'commerce');
         }
 
         $paidTransactions = ArrayHelper::where($this->_transactions, static function(Transaction $transaction) {
@@ -2275,6 +2285,8 @@ class Order extends Element
         $paid = array_sum(ArrayHelper::getColumn($paidTransactions, 'amount', false));
         $refunded = array_sum(ArrayHelper::getColumn($refundedTransactions, 'amount', false));
 
+        Craft::info('Paid Amount: ' . $paid, 'commerce');
+        Craft::info('End get total paid', 'commerce');
         return $paid - $refunded;
     }
 
@@ -2945,14 +2957,18 @@ class Order extends Element
      */
     public function getTransactions(): array
     {
+        Craft::info('Start get transactions (in order element)', 'commerce');
         if (!$this->id) {
             $this->_transactions = [];
         }
 
         if ($this->_transactions === null) {
+            Craft::info('Transactions `null` retrieving latest (in order element)', 'commerce');
             $this->_transactions = Plugin::getInstance()->getTransactions()->getAllTransactionsByOrderId($this->id);
+            Craft::info($this->_transactions, 'commerce');
         }
 
+        Craft::info('Returning transactions (in order element)', 'commerce');
         return $this->_transactions;
     }
 
