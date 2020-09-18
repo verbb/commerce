@@ -446,7 +446,6 @@ class Transactions extends Component
             throw $e;
         }
 
-        sleep(10);
 
         Craft::error('After save transaction', 'commerce');
         Craft::error('Transaction:', 'commerce');
