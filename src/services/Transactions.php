@@ -275,15 +275,26 @@ class Transactions extends Component
      */
     public function getAllTransactionsByOrderId(int $orderId): array
     {
-        $rows = $this->_createTransactionQuery()
-            ->where(['orderId' => $orderId])
-            ->all();
+        Craft::error('Start getAllTransactionsByOrderId()', 'commerce');
+
+        $query = $this->_createTransactionQuery()
+            ->where(['orderId' => $orderId]);
+
+        Craft::error($query->getRawSql(), 'commerce');
+
+        $rows = $query->all();
+
+        Craft::error('transaction rows: ' . count($rows), 'commerce');
 
         $transactions = [];
 
         foreach ($rows as $row) {
+            Craft::error('Row data:', 'commerce');
+            Craft::error($row, 'commerce');
             $transactions[] = new Transaction($row);
         }
+
+        Craft::error('End getAllTransactionsByOrderId()', 'commerce');
 
         return $transactions;
     }
