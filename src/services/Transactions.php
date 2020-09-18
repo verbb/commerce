@@ -428,14 +428,25 @@ class Transactions extends Component
             'parentId'
         ];
 
-        $record = new TransactionRecord();
+        $transaction = Craft::$app->getDb()->beginTransaction();
+        try {
+            $record = new TransactionRecord();
 
-        foreach ($fields as $field) {
-            $record->$field = $model->$field;
+            foreach ($fields as $field) {
+                $record->$field = $model->$field;
+            }
+
+            Craft::error('Before save transaction', 'commerce');
+
+            $record->save(false);
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
         }
 
-        Craft::error('Before save transaction', 'commerce');
-        $record->save(false);
+
         Craft::error('After save transaction', 'commerce');
         Craft::error('Transaction:', 'commerce');
         $model->id = $record->id;
