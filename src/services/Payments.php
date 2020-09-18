@@ -238,7 +238,7 @@ class Payments extends Component
      */
     public function processPayment(Order $order, BasePaymentForm $form, &$redirect, &$transaction)
     {
-        Craft::info('Start process payment method', 'commerce');
+        Craft::error('Start process payment method', 'commerce');
         // Raise the 'beforeProcessPaymentEvent' event
         $event = new ProcessPaymentEvent(compact('order', 'form'));
 
@@ -282,18 +282,18 @@ class Payments extends Component
             /** @var RequestResponseInterface $response */
             switch ($defaultAction) {
                 case TransactionRecord::TYPE_PURCHASE:
-                    Craft::info('Before gateway purchase', 'commerce');
+                    Craft::error('Before gateway purchase', 'commerce');
                     $response = $gateway->purchase($transaction, $form);
-                    Craft::info('After gateway purchase', 'commerce');
+                    Craft::error('After gateway purchase', 'commerce');
                     break;
                 case TransactionRecord::TYPE_AUTHORIZE:
                     $response = $gateway->authorize($transaction, $form);
                     break;
             }
 
-            Craft::info('Before update transaction', 'commerce');
+            Craft::error('Before update transaction', 'commerce');
             $this->_updateTransaction($transaction, $response);
-            Craft::info('After update transaction', 'commerce');
+            Craft::error('After update transaction', 'commerce');
 
             if ($this->hasEventHandlers(self::EVENT_AFTER_PROCESS_PAYMENT)) {
                 $this->trigger(self::EVENT_AFTER_PROCESS_PAYMENT, new ProcessPaymentEvent(compact('order', 'transaction', 'form', 'response')));
@@ -310,9 +310,9 @@ class Payments extends Component
             }
 
             // Success!
-            Craft::info('Before update order paid information (in process payment)', 'commerce');
+            Craft::error('Before update order paid information (in process payment)', 'commerce');
             $order->updateOrderPaidInformation();
-            Craft::info('After update order paid information (in process payment)', 'commerce');
+            Craft::error('After update order paid information (in process payment)', 'commerce');
         } catch (Exception $e) {
             $transaction->status = TransactionRecord::STATUS_FAILED;
             $transaction->message = $e->getMessage();

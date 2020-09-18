@@ -57,7 +57,7 @@ class PaymentsController extends BaseFrontEndController
      */
     public function actionPay()
     {
-        Craft::info('Start payments/pay action', 'commerce');
+        Craft::error('Start payments/pay action', 'commerce');
         $this->requirePostRequest();
 
         $error = '';
@@ -366,7 +366,7 @@ class PaymentsController extends BaseFrontEndController
         $updateCartSearchIndexes = Plugin::getInstance()->getSettings()->updateCartSearchIndexes;
         $updateSearchIndex = ($order->isCompleted || $updateCartSearchIndexes);
 
-        Craft::info('Before order save in payments/pay', 'commerce');
+        Craft::error('Before order save in payments/pay', 'commerce');
         if (Craft::$app->getElements()->saveElement($order, true, false, $updateSearchIndex)) {
             // Has the order changed in a significant way?
             if ($totalPriceChanged || $totalQtyChanged || $totalAdjustmentsChanged) {
@@ -411,9 +411,9 @@ class PaymentsController extends BaseFrontEndController
 
         if (!$paymentForm->hasErrors() && !$order->hasErrors()) {
             try {
-                Craft::info('Before process payment in payments/pay', 'commerce');
+                Craft::error('Before process payment in payments/pay', 'commerce');
                 $plugin->getPayments()->processPayment($order, $paymentForm, $redirect, $transaction);
-                Craft::info('After process payment in payments/pay', 'commerce');
+                Craft::error('After process payment in payments/pay', 'commerce');
                 $success = true;
             } catch (PaymentException $exception) {
                 $error = $exception->getMessage();
@@ -463,7 +463,7 @@ class PaymentsController extends BaseFrontEndController
             return $this->redirect($redirect);
         }
         if ($order->returnUrl) {
-            Craft::info('Before redirect to return URL', 'commerce');
+            Craft::error('Before redirect to return URL', 'commerce');
             return $this->redirect($order->returnUrl);
         } else {
             return $this->redirectToPostedUrl($order);

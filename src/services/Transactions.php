@@ -386,13 +386,13 @@ class Transactions extends Component
      */
     public function saveTransaction(Transaction $model, bool $runValidation = true): bool
     {
-        Craft::info('Start save transaction', 'commerce');
+        Craft::error('Start save transaction', 'commerce');
         if ($model->id) {
             throw new TransactionException('Transactions cannot be modified.');
         }
 
         if ($runValidation && !$model->validate()) {
-            Craft::info('Transaction not saved due to validation error.', __METHOD__);
+            Craft::error('Transaction not saved due to validation error.', __METHOD__);
 
             return false;
         }
@@ -423,17 +423,17 @@ class Transactions extends Component
             $record->$field = $model->$field;
         }
 
-        Craft::info('Before save transaction', 'commerce');
+        Craft::error('Before save transaction', 'commerce');
         $record->save(false);
-        Craft::info('After save transaction', 'commerce');
-        Craft::info('Transaction:', 'commerce');
+        Craft::error('After save transaction', 'commerce');
+        Craft::error('Transaction:', 'commerce');
         $model->id = $record->id;
-        Craft::info($record->toArray(), 'commerce');
+        Craft::error($record->toArray(), 'commerce');
 
         if ($model->status === TransactionRecord::STATUS_SUCCESS) {
-            Craft::info('Before update order paid information (in save transaction)', 'commerce');
+            Craft::error('Before update order paid information (in save transaction)', 'commerce');
             $model->order->updateOrderPaidInformation();
-            Craft::info('After update order paid information (in save transaction)', 'commerce');
+            Craft::error('After update order paid information (in save transaction)', 'commerce');
         }
 
         if ($model->status === TransactionRecord::STATUS_PROCESSING) {
