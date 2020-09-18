@@ -282,7 +282,7 @@ class Transactions extends Component
 
         Craft::error($query->getRawSql(), 'commerce');
 
-        $rows = $query->all();
+        $rows = $query->all(Craft::$app->getDb()->getMaster());
 
         Craft::error('transaction rows: ' . count($rows), 'commerce');
 
