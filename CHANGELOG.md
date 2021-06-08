@@ -1,5 +1,10 @@
 # Release Notes for Craft Commerce
 
+## Unreleased
+
+### Fixed
+- Fixed a bug that caused a blank file to be created when rebuilding the project config. ([#2194](https://github.com/craftcms/commerce/issues/2194))
+
 ## 3.3.3 - 2021-06-01
 
 ### Added
